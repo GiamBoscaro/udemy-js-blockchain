@@ -2,7 +2,7 @@ class Blockchain {
 
     constructor() {
         this.chain = [];
-        this.newTransactions = [];
+        this.pendingTransactions = [];
     }
 
     createNewBlock(nonce, previousBlockHash, hash) {
@@ -10,7 +10,7 @@ class Blockchain {
             index: this.chain.length,
             timestamp: Date.now(),
             // adds pending transactions to this block
-            transactions: this.newTransactions,
+            transactions: this.pendingTransactions,
             // proof of work of the block
             nonce,
             // hash of all the new transactions of the current block
@@ -20,10 +20,34 @@ class Blockchain {
         }
 
         // transactions are now in the blockchain so the list will be cleared
-        this.newTransactions = [];
+        this.pendingTransactions = [];
         this.chain.push(newBlock);
 
         return newBlock;
+    }
+
+    getLastBlock() {
+        return this.chain[this.chain.length - 1];
+    }
+
+    createNewTransaction(amount, sender, recipient) {
+        const newTransaction = {
+            amount,
+            sender,
+            recipient,
+        };
+
+        this.pendingTransactions.push(newTransaction);
+
+        if (this.chain.length === 0) {
+            return 0;
+        }
+
+        return this.getLastBlock()['index'] + 1;
+    }
+
+    hashBlock(blockData) {
+        
     }
 }
 

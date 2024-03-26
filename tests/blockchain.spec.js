@@ -25,8 +25,8 @@ describe('Blockchain', () => {
         const myBlockchain = new Blockchain();
 
         expect(myBlockchain).toBeDefined();
-        expect(myBlockchain.newTransactions).toBeDefined();
-        expect(myBlockchain.newTransactions.length).toBe(0);
+        expect(myBlockchain.pendingTransactions).toBeDefined();
+        expect(myBlockchain.pendingTransactions.length).toBe(0);
         expect(myBlockchain.chain).toBeDefined();
         expect(myBlockchain.chain.length).toBe(0);
 
@@ -57,6 +57,32 @@ describe('Blockchain', () => {
 
         expect(myBlockchain.chain.length).toBe(3);
 
+        done();
+    });
+    // getLastBlock
+    test('Should get the last block', (done) => {
+        const myBlockchain = new Blockchain();
+        const newBlock = myBlockchain.createNewBlock(2389, 'sdnjgdngkd', 'wbjf34fsnv');
+        const lastBlock = myBlockchain.getLastBlock();
+
+        expect(lastBlock).toBe(newBlock);
+        expect(lastBlock.index).toBe(newBlock.index);
+
+        done();
+    });
+    // createNewTransaction
+    test('Should add a pending transaction', (done) => {
+        const myBlockchain = new Blockchain();
+        let expectedIndex = myBlockchain.createNewTransaction(10, 'abc', 'def');
+
+        expect(myBlockchain.pendingTransactions.length).toBe(1);
+        expect(expectedIndex).toBe(0);
+
+        myBlockchain.createNewBlock(1234, 'aaa', 'bbb');
+        expectedIndex = myBlockchain.createNewTransaction(20, 'abc', 'def');
+        expect(myBlockchain.pendingTransactions.length).toBe(1);
+        expect(expectedIndex).toBe(1);
+        
         done();
     });
 });
