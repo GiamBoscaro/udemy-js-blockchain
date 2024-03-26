@@ -2,9 +2,10 @@ const sha256 = require("sha256");
 
 class Blockchain {
 
-    constructor() {
+    constructor(difficulty = 4) {
         this.chain = [];
         this.pendingTransactions = [];
+        this.difficulty = difficulty;
     }
 
     createNewBlock(nonce, previousBlockHash, hash) {
@@ -52,6 +53,25 @@ class Blockchain {
         const dataAsString = previousBlockHash + nonce.toString() + JSON.stringify(currentBlockData);
         const hash = sha256(dataAsString);
         return hash;
+    }
+
+    /**
+     * Repeatedly hash block until it finds the correct hash
+     * (example: must start with four 0) by changing the nonce.
+     * Return the magic nonce value
+     * @param {string} previousBlockHash 
+     * @param {object} currentBlockData 
+     */
+    proofOfWork(previousBlockHash, currentBlockData) {
+        const prefix = Buffer.alloc(this.difficulty, '0').toString();
+
+        let nonce = -1;
+        let hash = '';
+        do {
+            nonce++;
+            hash = this.hashBlock(previousBlockHash, currentBlockData, nonce);
+        } while(!hash.startsWith(prefix));
+        return nonce;
     }
 }
 

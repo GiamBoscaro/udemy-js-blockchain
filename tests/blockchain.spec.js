@@ -86,7 +86,7 @@ describe('Blockchain', () => {
         done();
     });
     // hashBlock
-    test('Should create a new empty block', (done) => {
+    test('Should return the sha256 hash of a block', (done) => {
         const myBlockchain = new Blockchain();
         
         const blockData = [
@@ -119,6 +119,38 @@ describe('Blockchain', () => {
         const restoredHash = myBlockchain.hashBlock('dsfsdfsg', blockData, 1234);
         expect(restoredHash).toBeDefined();
         expect(hash === restoredHash).toBe(true);
+
+        done();
+    });
+    // proofOfWork
+    test('Should return a nonce that creates a 0000 hash', (done) => {
+        const myBlockchain = new Blockchain();
+        
+        const previousBlockHash = 'skdnfdknbdgdfkndfknd';
+        const currentBlockData = [
+            {
+                amount: 10,
+                sender: 'abc',
+                recipient: 'def',
+            },
+            {
+                amount: 20,
+                sender: 'fdsn',
+                recipient: 'jlkdsg',
+            },
+            {
+                amount: 30,
+                sender: 'kefdp',
+                recipient: '0edvkn',
+            },
+        ];
+
+        const nonce = myBlockchain.proofOfWork(previousBlockHash, currentBlockData);
+        expect(nonce).toBeDefined();
+        expect(nonce >= 0).toBe(true);
+
+        const hash = myBlockchain.hashBlock(previousBlockHash, currentBlockData, nonce);
+        expect(hash.startsWith('0000')).toBe(true);
 
         done();
     });
