@@ -85,4 +85,41 @@ describe('Blockchain', () => {
         
         done();
     });
+    // hashBlock
+    test('Should create a new empty block', (done) => {
+        const myBlockchain = new Blockchain();
+        
+        const blockData = [
+            {
+                amount: 10,
+                sender: 'abc',
+                recipient: 'def',
+            },
+            {
+                amount: 20,
+                sender: 'fdsn',
+                recipient: 'jlkdsg',
+            },
+            {
+                amount: 30,
+                sender: 'kefdp',
+                recipient: '0edvkn',
+            },
+        ];
+
+        const hash = myBlockchain.hashBlock('dsfsdfsg', blockData, 1234);
+        expect(hash).toBeDefined();
+
+        blockData[0].amount = 11;
+        const tamperedHash = myBlockchain.hashBlock('dsfsdfsg', blockData, 1234);
+        expect(tamperedHash).toBeDefined();
+        expect(hash !== tamperedHash).toBe(true);
+
+        blockData[0].amount = 10;
+        const restoredHash = myBlockchain.hashBlock('dsfsdfsg', blockData, 1234);
+        expect(restoredHash).toBeDefined();
+        expect(hash === restoredHash).toBe(true);
+
+        done();
+    });
 });
