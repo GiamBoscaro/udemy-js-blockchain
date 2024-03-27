@@ -6,11 +6,13 @@ class Blockchain {
         this.chain = [];
         this.pendingTransactions = [];
         this.difficulty = difficulty;
+
+        this.createNewBlock(100, '0', '0');
     }
 
     createNewBlock(nonce, previousBlockHash, hash) {
         const newBlock = {
-            index: this.chain.length,
+            index: this.chain.length + 1,
             timestamp: Date.now(),
             // adds pending transactions to this block
             transactions: this.pendingTransactions,
@@ -41,10 +43,6 @@ class Blockchain {
         };
 
         this.pendingTransactions.push(newTransaction);
-
-        if (this.chain.length === 0) {
-            return 0;
-        }
 
         return this.getLastBlock()['index'] + 1;
     }

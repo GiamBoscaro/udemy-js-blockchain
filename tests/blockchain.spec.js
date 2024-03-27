@@ -28,7 +28,12 @@ describe('Blockchain', () => {
         expect(myBlockchain.pendingTransactions).toBeDefined();
         expect(myBlockchain.pendingTransactions.length).toBe(0);
         expect(myBlockchain.chain).toBeDefined();
-        expect(myBlockchain.chain.length).toBe(0);
+        expect(myBlockchain.chain.length).toBe(1);
+        // Genesis block
+        expect(myBlockchain.chain[0].hash).toBe('0');
+        expect(myBlockchain.chain[0].previousBlockHash).toBe('0');
+        expect(myBlockchain.chain[0].nonce).toBe(100);
+        expect(myBlockchain.chain[0].transactions.length).toBe(0);
 
         done();
     });
@@ -39,9 +44,9 @@ describe('Blockchain', () => {
 
         expect(validator.validate(newBlock, blockSchema)).toBe(true);
         expect(newBlock.nonce).toBe(2389);
-        expect(newBlock.index).toBe(0);
+        expect(newBlock.index).toBe(2);
 
-        expect(myBlockchain.chain.length).toBe(1);
+        expect(myBlockchain.chain.length).toBe(2);
 
         done();
     });
@@ -55,7 +60,7 @@ describe('Blockchain', () => {
         expect(validator.validate(newBlock2, blockSchema)).toBe(true);
         expect(validator.validate(newBlock3, blockSchema)).toBe(true);
 
-        expect(myBlockchain.chain.length).toBe(3);
+        expect(myBlockchain.chain.length).toBe(4);
 
         done();
     });
@@ -76,12 +81,12 @@ describe('Blockchain', () => {
         let expectedIndex = myBlockchain.createNewTransaction(10, 'abc', 'def');
 
         expect(myBlockchain.pendingTransactions.length).toBe(1);
-        expect(expectedIndex).toBe(0);
+        expect(expectedIndex).toBe(2);
 
         myBlockchain.createNewBlock(1234, 'aaa', 'bbb');
         expectedIndex = myBlockchain.createNewTransaction(20, 'abc', 'def');
         expect(myBlockchain.pendingTransactions.length).toBe(1);
-        expect(expectedIndex).toBe(1);
+        expect(expectedIndex).toBe(3);
         
         done();
     });
