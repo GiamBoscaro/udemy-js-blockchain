@@ -4,6 +4,8 @@
   "description": "A blockchain example made with JavaScript",
   "main": "index.js",
   "scripts": {
+    "dev": "nodemon --watch src -e js src/api.js",
+    "start": "node src/api.js",
     "test": "jest tests"
   },
   "repository": {
@@ -24,9 +26,13 @@
   "homepage": "https://github.com/GiamBoscaro/udemy-js-blockchain#readme",
   "devDependencies": {
     "jest": "^29.7.0",
+    "nodemon": "^3.1.0",
     "z-schema": "^6.0.1"
   },
   "dependencies": {
-    "sha256": "^0.2.0"
+    "axios": "^1.6.8",
+    "express": "^4.19.2",
+    "sha256": "^0.2.0",
+    "uuid": "^9.0.1"
   }
 }
