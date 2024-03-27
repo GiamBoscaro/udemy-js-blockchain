@@ -94,4 +94,16 @@ app.post('/register-nodes-bulk', function (req, res) {
 
 app.listen(port, function() {
 	console.log(`Listening on port ${port}...`);
+    // Automatically registers the nodes to the network, passing
+    // through node 1. Node 1 must be the first running.
+    if (bitcoin.currentNodeUrl !== 'http://localhost:3001') {
+        axios.post(
+            `http://localhost:3001/register-and-broadcast-node`,
+            { newNodeUrl: bitcoin.currentNodeUrl },
+        )
+        .then((res) => {
+            console.log(res.data.note);
+            console.log('Current nodes in the network', bitcoin.networkNodes);
+        });
+    }
 });
