@@ -4,9 +4,12 @@
   "description": "A blockchain example made with JavaScript",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon --watch src -e js src/api.js",
-    "start": "node src/api.js",
-    "test": "jest tests"
+    "dev": "nodemon --watch src -e js src/networkNode.js",
+    "start": "node src/networkNode.js",
+    "start:ci": "node src/networkNode.js 3000",
+    "test": "jest tests",
+    "test:coverage": "jest tests --coverage --ci",
+    "test:ci": "start-server-and-test start:ci http://localhost:3000 test:coverage"
   },
   "repository": {
     "type": "git",

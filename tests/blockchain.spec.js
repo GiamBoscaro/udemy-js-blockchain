@@ -29,6 +29,10 @@ describe('Blockchain', () => {
         expect(myBlockchain.pendingTransactions.length).toBe(0);
         expect(myBlockchain.chain).toBeDefined();
         expect(myBlockchain.chain.length).toBe(1);
+        expect(myBlockchain.currentNodeUrl).toBeDefined();
+        expect(myBlockchain.currentNodeUrl.startsWith('http')).toBe(true);
+        expect(myBlockchain.networkNodes).toBeDefined();
+        expect(myBlockchain.networkNodes.length).toBe(0);
         // Genesis block
         expect(myBlockchain.chain[0].hash).toBe('0');
         expect(myBlockchain.chain[0].previousBlockHash).toBe('0');

@@ -1,11 +1,17 @@
 const sha256 = require("sha256");
 
+const port = process.argv[2];
+const url = `http://localhost:${port}`;
+
 class Blockchain {
 
     constructor(difficulty = 4) {
         this.chain = [];
         this.pendingTransactions = [];
         this.difficulty = difficulty;
+
+        this.currentNodeUrl = url;
+        this.networkNodes = [];
 
         this.createNewBlock(100, '0', '0');
     }

@@ -16,8 +16,13 @@ const blockchainSchema = {
             type: 'array',
             items: { type: 'object' },
         },
+        currentNodeUrl: { type: 'string' },
+        networkNodes: {
+          type: 'array',
+          items: { type: 'string' },
+      }
     },
-    required: ['chain', 'pendingTransactions'],
+    required: ['chain', 'pendingTransactions', 'currentNodeUrl', 'networkNodes'],
 };
 
 const transactionSchema = {
@@ -88,6 +93,61 @@ describe('API', () => {
         expect(res.status).toBe(200);
         expect(res.data.note).toBeDefined();
         expect(validator.validate(res.data.block, blockSchema)).toBe(true);
+        done();
+      })
+      .catch((e) => {
+        console.error(e);
+        expect(e).toBeDefined();
+        done(e);
+      });
+  });
+  // /register-and-broadcast-node
+  test('Should add a new node to the network and broadcast its url', (done) => {
+    const data = {
+      newNodeUrl: 'http://localhost:3000',
+    };
+    axios.post(`${endpoint}/register-and-broadcast-node`, data)
+      .then((res) => {
+        expect(res.status).toBe(200);
+        expect(res.data.note).toBeDefined();
+        done();
+      })
+      .catch((e) => {
+        console.error(e);
+        expect(e).toBeDefined();
+        done(e);
+      });
+  });
+  // /register-node
+  test('Should register a new node url to an existing node', (done) => {
+    const data = {
+      newNodeUrl: 'http://localhost:3000',
+    };
+    axios.post(`${endpoint}/register-node`, data)
+      .then((res) => {
+        expect(res.status).toBe(200);
+        expect(res.data.note).toBeDefined();
+        done();
+      })
+      .catch((e) => {
+        console.error(e);
+        expect(e).toBeDefined();
+        done(e);
+      });
+  });
+  // /register-nodes-bulk
+  test('Should add existing nodes of the network to the list', (done) => {
+    const data = {
+      allNetworkNodes: [
+        'http://localhost:3000',
+        'http://localhost:3001',
+        'http://localhost:3002',
+      ],
+    };
+    axios.post(`${endpoint}/register-nodes-bulk`, data)
+      .then((res) => {
+        expect(res.status).toBe(200);
+        expect(res.data.note).toBeDefined();
         done();
       })
       .catch((e) => {
