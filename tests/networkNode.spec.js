@@ -111,6 +111,80 @@ describe('API', () => {
         done(e);
       });
   });
+  // /receive-new-block
+  test('Should receive a new block from the network and clear the pending transactions', (done) => {
+    axios.get(`${endpoint}/blockchain`)
+      .then((res) => {
+        const blockchain = res.data;
+        const data = {
+          index: blockchain.chain.length + 1,
+          nonce: 123,
+          hash: 'abc',
+          previousBlockHash: blockchain.chain[blockchain.chain.length - 1].hash ,
+          transactions: [],
+          timestamp: Date.now(),
+        };
+        axios.post(`${endpoint}/receive-new-block`, data)
+          .then((res) => {
+            expect(res.status).toBe(200);
+            expect(res.data.note).toBeDefined();
+            expect(validator.validate(res.data.newBlock, blockSchema)).toBe(true);
+            done();
+          })
+          .catch((e) => {
+            console.error(e);
+            expect(e).toBeDefined();
+            done(e);
+          });
+      });
+  });
+  test('Should reject the block because of wrong hash', (done) => {
+    axios.get(`${endpoint}/blockchain`)
+      .then((res) => {
+        const blockchain = res.data;
+        const data = {
+          index: blockchain.chain.length + 1,
+          nonce: 123,
+          hash: 'abc',
+          previousBlockHash: blockchain.chain[blockchain.chain.length - 1].hash + 'xxx',
+          transactions: [],
+          timestamp: Date.now(),
+        };
+        axios.post(`${endpoint}/receive-new-block`, data)
+          .then((res) => {
+            done(res.data.note);
+          })
+          .catch((e) => {
+            console.log(e)
+            expect(e).toBeDefined();
+            expect(e.response.status).toBe(400);
+            done();
+          });
+      });
+  });
+  test('Should reject the block because of wrong index', (done) => {
+    axios.get(`${endpoint}/blockchain`)
+    .then((res) => {
+      const blockchain = res.data;
+      const data = {
+        index: blockchain.chain.length + 2,
+        nonce: 123,
+        hash: 'abc',
+        previousBlockHash: blockchain.chain[blockchain.chain.length - 1].hash,
+        transactions: [],
+        timestamp: Date.now(),
+      };
+      axios.post(`${endpoint}/receive-new-block`, data)
+        .then((res) => {
+          done(res.data.note);
+        })
+        .catch((e) => {
+          expect(e).toBeDefined();
+          expect(e.response.status).toBe(400);
+          done();
+        });
+    });
+  });
   // /register-and-broadcast-node
   test('Should add a new node to the network and broadcast its url', (done) => {
     const data = {
