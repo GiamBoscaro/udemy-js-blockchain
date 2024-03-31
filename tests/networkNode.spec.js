@@ -25,16 +25,6 @@ const blockchainSchema = {
     required: ['chain', 'pendingTransactions', 'currentNodeUrl', 'networkNodes'],
 };
 
-const transactionSchema = {
-    type: 'object',
-    properties: {
-        amount: { type: 'number' },
-        sender: { type: 'string' },
-        recipient: { type: 'string' },
-    },
-    required: ['amount', 'sender', 'recipient'],
-};
-
 const blockSchema = {
     type: 'object',
     properties: {
@@ -73,8 +63,28 @@ describe('API', () => {
         amount: 10,
         sender: 'abc',
         recipient: 'def',
+        transactionId: 111,
     };
     axios.post(`${endpoint}/transaction`, data)
+      .then((res) => {
+        expect(res.status).toBe(200);
+        expect(res.data.note).toBeDefined();
+        done();
+      })
+      .catch((e) => {
+        console.error(e);
+        expect(e).toBeDefined();
+        done(e);
+      });
+  });
+  // /transaction
+  test('Should add a new transaction and broadcast it to existing nodes', (done) => {
+    const data = {
+        amount: 10,
+        sender: 'abc',
+        recipient: 'def',
+    };
+    axios.post(`${endpoint}/transaction/broadcast`, data)
       .then((res) => {
         expect(res.status).toBe(200);
         expect(res.data.note).toBeDefined();

@@ -1,4 +1,5 @@
 const sha256 = require("sha256");
+const uuid = require('uuid');
 
 const port = process.argv[2];
 const url = `http://localhost:${port}`;
@@ -42,14 +43,19 @@ class Blockchain {
     }
 
     createNewTransaction(amount, sender, recipient) {
+    const transactionId = uuid.v1().split('-').join('');
         const newTransaction = {
             amount,
             sender,
             recipient,
+            transactionId,
         };
+        
+        return newTransaction;
+    }
 
-        this.pendingTransactions.push(newTransaction);
-
+    addPendingTransaction(transaction) {
+        this.pendingTransactions.push(transaction);
         return this.getLastBlock()['index'] + 1;
     }
 

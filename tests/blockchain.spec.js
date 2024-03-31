@@ -19,6 +19,17 @@ const blockSchema = {
     required: ['index', 'timestamp', 'transactions', 'nonce', 'hash', 'previousBlockHash'],
 };
 
+const transactionSchema = {
+    type: 'object',
+    properties: {
+        transactionId: { type: 'string' },
+        amount: { type: 'number' },
+        sender: { type: 'string' },
+        recipient: { type: 'string' },
+    },
+    required: ['transactionId', 'amount', 'sender', 'recipient'],
+};
+
 describe('Blockchain', () => {
     // constructor
     test('Should create a instance of a Blockchain object', (done) => {
@@ -80,15 +91,27 @@ describe('Blockchain', () => {
         done();
     });
     // createNewTransaction
+    test('Should create a pending transaction', (done) => {
+        const myBlockchain = new Blockchain();
+        let newTransaction = myBlockchain.createNewTransaction(10, 'abc', 'def');
+
+        expect(newTransaction).toBeDefined();
+        expect(validator.validate(newTransaction, transactionSchema)).toBe(true);
+        
+        done();
+    });
+    // addPendingTransaction
     test('Should add a pending transaction', (done) => {
         const myBlockchain = new Blockchain();
-        let expectedIndex = myBlockchain.createNewTransaction(10, 'abc', 'def');
+        let newTransaction = myBlockchain.createNewTransaction(10, 'abc', 'def');
+        let expectedIndex = myBlockchain.addPendingTransaction(newTransaction);
 
         expect(myBlockchain.pendingTransactions.length).toBe(1);
         expect(expectedIndex).toBe(2);
 
         myBlockchain.createNewBlock(1234, 'aaa', 'bbb');
-        expectedIndex = myBlockchain.createNewTransaction(20, 'abc', 'def');
+        newTransaction = myBlockchain.createNewTransaction(20, 'abc', 'def');
+        expectedIndex = myBlockchain.addPendingTransaction(newTransaction);
         expect(myBlockchain.pendingTransactions.length).toBe(1);
         expect(expectedIndex).toBe(3);
         
