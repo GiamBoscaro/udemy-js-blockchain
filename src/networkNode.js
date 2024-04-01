@@ -183,6 +183,11 @@ app.get('/address/:address', function(req, res) {
 	res.json(addressData);
 });
 
+// serve the frontend
+app.get('/block-explorer', function(req, res) {
+	res.sendFile(`${process.cwd()}/view/index.html`);
+});
+
 app.listen(port, function() {
 	console.log(`Listening on port ${port}...`);
     // Automatically registers the nodes to the network, passing
