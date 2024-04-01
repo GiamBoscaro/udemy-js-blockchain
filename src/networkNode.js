@@ -88,6 +88,38 @@ app.post('/receive-new-block', function (req, res) {
     res.json({ note: 'New block received and accepted.', newBlock });  
 });
 
+// 
+app.post('/consensus', async function (req, res) {
+    const promises = [];
+    for (const url of bitcoin.networkNodes) {
+        const promise = axios.get(`${url}/blockchain`);
+        promises.push(promise);
+    }
+
+    // idenfities if a blockchain in the network is longer than
+    // the one hosted in the current node
+    const blockchains = await Promise.all(promises);
+    let longestChain = null;
+    let newPendingTransactions = null;
+    let longestChainLength = bitcoin.chain.length;
+    for (const b of blockchains) {
+        if (b.data.chain.length > longestChainLength 
+            && bitcoin.chainIsValid(b.data.chain)) {
+            longestChainLength = b.data.chain.length;
+            longestChain = b.data.chain;
+            newPendingTransactions = b.pendingTransactions;
+        }
+    }
+
+    if (longestChain && bitcoin.chainIsValid(longestChain)) {
+        bitcoin.chain = longestChain;
+        bitcoin.pendingTransactions = newPendingTransactions;
+        res.json({ note: 'This chain has been replaced.', chain: bitcoin.chain, replaced: true });  
+    } else {
+        res.json({ note: 'Current chain was not replaced.', chain: bitcoin.chain, replaced: false }); 
+    }
+});
+
 // register a node and boradcast it to the network
 app.post('/register-and-broadcast-node', async function (req, res) {
     const newNodeUrl = req.body.newNodeUrl;

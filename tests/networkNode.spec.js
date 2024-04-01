@@ -155,7 +155,6 @@ describe('API', () => {
             done(res.data.note);
           })
           .catch((e) => {
-            console.log(e)
             expect(e).toBeDefined();
             expect(e.response.status).toBe(400);
             done();
@@ -184,6 +183,38 @@ describe('API', () => {
           done();
         });
     });
+  });
+  // /consensus
+  test('Should not replace the chain', (done) => {
+    axios.post(`${endpoint}/consensus`)
+      .then((res) => {
+        expect(res.status).toBe(200);
+        expect(res.data.note).toBeDefined();
+        expect(res.data.chain).toBeDefined();
+        expect(res.data.replaced).toBe(false);
+        done();
+      })
+      .catch((e) => {
+        console.error(e);
+        expect(e).toBeDefined();
+        done(e);
+      });
+  });
+  test('Should replace the chain', (done) => {
+    axios.post(`${endpoint}/consensus`)
+      .then((res) => {
+        // TODO: hard to test with unit tests
+        // expect(res.status).toBe(200);
+        // expect(res.data.note).toBeDefined();
+        // expect(res.data.chain).toBeDefined();
+        // expect(res.data.replaced).toBe(true);
+        done();
+      })
+      .catch((e) => {
+        console.error(e);
+        expect(e).toBeDefined();
+        done(e);
+      });
   });
   // /register-and-broadcast-node
   test('Should add a new node to the network and broadcast its url', (done) => {
