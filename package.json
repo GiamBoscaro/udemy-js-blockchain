@@ -7,7 +7,7 @@
     "dev": "nodemon --watch src -e js src/networkNode.js",
     "start": "node src/networkNode.js",
     "start:ci": "node src/networkNode.js 3000",
-    "test": "jest tests",
+    "test": "jest tests/blockchain.spec.js",
     "test:coverage": "jest tests --coverage --ci",
     "test:ci": "start-server-and-test start:ci http://localhost:3000 test:coverage"
   },

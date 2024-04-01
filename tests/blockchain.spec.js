@@ -186,4 +186,114 @@ describe('Blockchain', () => {
 
         done();
     });
+    // chainIsValid
+    test('Should validate an empty chain', (done) => {
+        const myBlockchain = new Blockchain();
+
+        const isValid = myBlockchain.chainIsValid(myBlockchain.chain);
+        expect(isValid).toBe(true);
+
+        done();
+    });
+    test('Should validate a chain', (done) => {
+        const myBlockchain = new Blockchain(3);
+
+        myBlockchain.addPendingTransaction(myBlockchain.createNewTransaction(10, 'abc', 'def'));
+        myBlockchain.addPendingTransaction(myBlockchain.createNewTransaction(20, 'dbsf', 'vdsdg'));
+
+        const blockData1 = { transactions: myBlockchain.pendingTransactions, index: 2 };
+        const nonce1 = myBlockchain.proofOfWork('0', blockData1);
+        const hash1 = myBlockchain.hashBlock('0', blockData1, nonce1);
+        const block1 = myBlockchain.createNewBlock(nonce1, '0', hash1);
+
+        myBlockchain.addPendingTransaction(myBlockchain.createNewTransaction(30, 'dsbjk', 'dsfsdf'));
+        const blockData2 = { transactions: myBlockchain.pendingTransactions, index: 3 };
+        const nonce2 = myBlockchain.proofOfWork(hash1, blockData2);
+        const hash2 = myBlockchain.hashBlock(hash1, blockData2, nonce2);
+        const block2 = myBlockchain.createNewBlock(nonce2, hash1, hash2);
+
+        const isValid = myBlockchain.chainIsValid(myBlockchain.chain);
+        expect(isValid).toBe(true);
+
+        done();
+    });
+    test('Should fail because previous block hash is wrong', (done) => {
+        const myBlockchain = new Blockchain(3);
+
+        myBlockchain.addPendingTransaction(myBlockchain.createNewTransaction(10, 'abc', 'def'));
+        myBlockchain.addPendingTransaction(myBlockchain.createNewTransaction(20, 'dbsf', 'vdsdg'));
+
+        const blockData1 = { transactions: myBlockchain.pendingTransactions, index: 2 };
+        const nonce1 = myBlockchain.proofOfWork('0', blockData1);
+        const hash1 = myBlockchain.hashBlock('0', blockData1, nonce1);
+        const block1 = myBlockchain.createNewBlock(nonce1, '0', hash1);
+        
+        myBlockchain.addPendingTransaction(myBlockchain.createNewTransaction(30, 'dsbjk', 'dsfsdf'));
+        const blockData2 = { transactions: myBlockchain.pendingTransactions, index: 3 };
+        const nonce2 = myBlockchain.proofOfWork(hash1, blockData2);
+        const hash2 = myBlockchain.hashBlock(hash1, blockData2, nonce2);
+        const block2 = myBlockchain.createNewBlock(nonce2, hash1, hash2);
+
+        // insert wrong hash
+        myBlockchain.chain[myBlockchain.chain.length - 1].previousBlockHash = '1';
+
+        const isValid = myBlockchain.chainIsValid(myBlockchain.chain);
+        expect(isValid).toBe(false);
+
+        done();
+    });
+    test('Should fail because current block has been changed', (done) => {
+        const myBlockchain = new Blockchain(3);
+
+        myBlockchain.addPendingTransaction(myBlockchain.createNewTransaction(10, 'abc', 'def'));
+        myBlockchain.addPendingTransaction(myBlockchain.createNewTransaction(20, 'dbsf', 'vdsdg'));
+
+        const blockData1 = { transactions: myBlockchain.pendingTransactions, index: 2 };
+        const nonce1 = myBlockchain.proofOfWork('0', blockData1);
+        const hash1 = myBlockchain.hashBlock('0', blockData1, nonce1);
+        const block1 = myBlockchain.createNewBlock(nonce1, '0', hash1);
+        
+        myBlockchain.addPendingTransaction(myBlockchain.createNewTransaction(30, 'dsbjk', 'dsfsdf'));
+        const blockData2 = { transactions: myBlockchain.pendingTransactions, index: 3 };
+        const nonce2 = myBlockchain.proofOfWork(hash1, blockData2);
+        const hash2 = myBlockchain.hashBlock(hash1, blockData2, nonce2);
+        const block2 = myBlockchain.createNewBlock(nonce2, hash1, hash2);
+
+        // insert wrong hash
+        myBlockchain.chain[myBlockchain.chain.length - 1].transactions.push(
+            myBlockchain.createNewTransaction(50, 'vdsdg', 'dbsf')
+        );
+
+        const isValid = myBlockchain.chainIsValid(myBlockchain.chain);
+        expect(isValid).toBe(false);
+
+        done();
+    });
+    test('Should fail because genesis block has wrong hash', (done) => {
+        const myBlockchain = new Blockchain();
+        myBlockchain.chain[0].hash = '1';
+
+        const isValid = myBlockchain.chainIsValid(myBlockchain.chain);
+        expect(isValid).toBe(false);
+
+        done();
+    });
+    test('Should fail because genesis block has wrong previous hash', (done) => {
+        const myBlockchain = new Blockchain();
+        myBlockchain.chain[0].previousBlockHash = '1';
+
+        const isValid = myBlockchain.chainIsValid(myBlockchain.chain);
+        expect(isValid).toBe(false);
+
+        done();
+    });
+    test('Should fail because genesis block has wrong nonce', (done) => {
+        const myBlockchain = new Blockchain();
+        myBlockchain.chain[0].nonce = 123;
+
+        const isValid = myBlockchain.chainIsValid(myBlockchain.chain);
+        expect(isValid).toBe(false);
+
+        done();
+    });
 });

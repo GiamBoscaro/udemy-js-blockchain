@@ -83,6 +83,37 @@ class Blockchain {
         } while(!hash.startsWith(prefix));
         return nonce;
     }
+
+    chainIsValid(blockchain) {
+        for (let i = 1; i < blockchain.length; i++) {
+            const currentBlock = blockchain[i];
+            const prevBlock = blockchain[i - 1];
+            if (currentBlock.previousBlockHash !== prevBlock.hash) {
+                return false;
+            }
+
+            const currentBlockData = {
+                transactions: currentBlock.transactions,
+                index: currentBlock.index,
+            };
+            const blockHash = this.hashBlock(prevBlock.hash, currentBlockData, currentBlock.nonce);
+            const prefix = Buffer.alloc(this.difficulty, '0').toString();
+
+            if (!blockHash.startsWith(prefix)) {
+                return false;
+            }
+        }
+
+        const genesisBlock = blockchain[0];
+        if (genesisBlock.nonce !== 100 
+            || genesisBlock.hash !== '0' 
+            || genesisBlock.previousBlockHash !== '0'
+            || genesisBlock.transactions.length !== 0) {
+            return false
+        }
+
+        return true;
+    }
 }
 
 module.exports = Blockchain;
