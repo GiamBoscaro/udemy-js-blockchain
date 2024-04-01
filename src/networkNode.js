@@ -88,7 +88,7 @@ app.post('/receive-new-block', function (req, res) {
     res.json({ note: 'New block received and accepted.', newBlock });  
 });
 
-// 
+// updates the blockchain of the current node based on the consensus
 app.post('/consensus', async function (req, res) {
     const promises = [];
     for (const url of bitcoin.networkNodes) {
@@ -160,6 +160,27 @@ app.post('/register-nodes-bulk', function (req, res) {
     }
 
     res.json({ note: 'Bulk registration successful.'});
+});
+
+// get block by blockHash
+app.get('/block/:blockHash', function(req, res) { 
+	const blockHash = req.params.blockHash;
+	const correctBlock = bitcoin.getBlock(blockHash);
+	res.json(correctBlock);
+});
+
+// get transaction by transactionId
+app.get('/transaction/:transactionId', function(req, res) {
+	const transactionId = req.params.transactionId;
+	const trasactionData = bitcoin.getTransaction(transactionId);
+	res.json(trasactionData);
+});
+
+// get address by address
+app.get('/address/:address', function(req, res) {
+	const address = req.params.address;
+	const addressData = bitcoin.getAddressData(address);
+	res.json(addressData);
 });
 
 app.listen(port, function() {

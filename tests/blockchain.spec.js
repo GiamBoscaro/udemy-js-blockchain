@@ -296,4 +296,106 @@ describe('Blockchain', () => {
 
         done();
     });
+    // getBlock
+    test('Should return the block with the requested hash', (done) => {
+        const myBlockchain = new Blockchain();
+        myBlockchain.createNewBlock(2389, 'sdnjgdngkd', 'wbjf34fsnv');
+        const block = myBlockchain.createNewBlock(1234, 'fjshdf', 'njfdjfsdhj');
+
+        const res = myBlockchain.getBlock(block.hash);
+        expect(res).toBeDefined();
+        expect(validator.validate(res, blockSchema)).toBe(true);
+
+        done();
+    });
+    test('Should return null as the hash does not exist', (done) => {
+        const myBlockchain = new Blockchain();
+        myBlockchain.createNewBlock(2389, 'sdnjgdngkd', 'wbjf34fsnv');
+
+        expect(myBlockchain.getBlock('abc')).toBe(null);
+
+        done();
+    });
+    // getTransaction
+    test('Should return the transaction by its id', (done) => {
+        const myBlockchain = new Blockchain();
+        let newTransaction = myBlockchain.createNewTransaction(20, 'abc', 'def');
+        myBlockchain.addPendingTransaction(newTransaction);
+        newTransaction = myBlockchain.createNewTransaction(10, '123', '456');
+        myBlockchain.addPendingTransaction(newTransaction);
+        myBlockchain.createNewBlock(4321, '0000123', '0000456');
+        myBlockchain.createNewBlock(1234, '0000abc', '0000def');
+
+        const res = myBlockchain.getTransaction(newTransaction.transactionId);
+        expect(res).toBeDefined();
+        expect(validator.validate(res.transaction, transactionSchema)).toBe(true);
+        expect(validator.validate(res.block, blockSchema)).toBe(true);
+
+        done();
+    });
+    test('Should return null as the transaction does not exist', (done) => {
+        const myBlockchain = new Blockchain();
+        let newTransaction = myBlockchain.createNewTransaction(20, 'abc', 'def');
+        newTransaction = myBlockchain.createNewTransaction(10, '123', '456');
+        myBlockchain.createNewBlock(4321, '0000123', '0000456');
+        myBlockchain.createNewBlock(1234, '0000abc', '0000def');
+
+        const res = myBlockchain.getTransaction('0987654321');
+        expect(res).toBeDefined();
+        expect(res.transaction).toBe(null);
+        expect(res.block).toBe(null);
+        
+
+        done();
+    });
+    // getAddressData
+    test('Should return the wallet balance and transaction of a user', (done) => {
+        const myBlockchain = new Blockchain();
+        let newTransaction = myBlockchain.createNewTransaction(20, 'user1', 'user2');
+        myBlockchain.addPendingTransaction(newTransaction);
+        newTransaction = myBlockchain.createNewTransaction(10, 'user1', 'user2');
+        myBlockchain.addPendingTransaction(newTransaction);
+        myBlockchain.createNewBlock(4321, '0000123', '0000456');
+
+        newTransaction = myBlockchain.createNewTransaction(15, 'user2', 'user3');
+        myBlockchain.addPendingTransaction(newTransaction);
+        myBlockchain.createNewBlock(1234, '0000abc', '0000def');
+
+        let res = myBlockchain.getAddressData('user1');
+        expect(res).toBeDefined();
+        expect(res.balance).toBe(-30);
+        expect(res.transactions.length).toBe(2);
+
+        res = myBlockchain.getAddressData('user2');
+        expect(res).toBeDefined();
+        expect(res.balance).toBe(15);
+        expect(res.transactions.length).toBe(3);
+
+
+        res = myBlockchain.getAddressData('user3');
+        expect(res).toBeDefined();
+        expect(res.balance).toBe(15);
+        expect(res.transactions.length).toBe(1);
+
+        done();
+    });
+    test('Should return an empty wallet as the user does not exist', (done) => {
+        const myBlockchain = new Blockchain();
+        let newTransaction = myBlockchain.createNewTransaction(20, 'user1', 'user2');
+        myBlockchain.addPendingTransaction(newTransaction);
+        newTransaction = myBlockchain.createNewTransaction(10, 'user1', 'user2');
+        myBlockchain.addPendingTransaction(newTransaction);
+        myBlockchain.createNewBlock(4321, '0000123', '0000456');
+
+        newTransaction = myBlockchain.createNewTransaction(15, 'user2', 'user3');
+        myBlockchain.addPendingTransaction(newTransaction);
+        myBlockchain.createNewBlock(1234, '0000abc', '0000def');
+
+        const res = myBlockchain.getAddressData('user4');
+        expect(res).toBeDefined();
+        expect(res.balance).toBe(0);
+        expect(res.transactions.length).toBe(0);
+
+        done();
+    });
 });
